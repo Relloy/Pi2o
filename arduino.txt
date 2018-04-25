@@ -1,0 +1,56 @@
+#include <dht.h>
+#include <math.h>
+#define DHT11_PIN 7
+dht DHT;
+int sensor_pin = A0;
+int output_value;
+int motorPin = 13;
+int watertime = 1;
+int watered = 0;
+
+void setup(){
+  Serial.begin(9600);
+  #setting up the pump pin to act as output.
+  pinMode(motorPin, OUTPUT);
+  delay(2000);
+}
+
+void loop(){
+  
+  #storing the raw moisture value from the sensor (ranges from 0 - 1023)
+  output_value= analogRead(sensor_pin);
+  #maps the 0 - 1023 range to a more sensible ranges
+  output_value = map(output_value,550,0,0,100);
+  
+  if(output_value < 35){
+    printOut(1);
+  }
+  else{
+    printOut(0);
+  }
+  delay(10000);
+}
+
+void pump(int n){
+ if(n == 1){
+  digitalWrite(motorPin, HIGH);
+  delay(1*8000);
+  
+  digitalWrite(motorPin, LOW);
+ }
+ else{
+  digitalWrite(motorPin, LOW);
+ } 
+ 
+}
+
+void printOut(int watering){
+  pump(watering);
+  Serial.print(watering);
+  Serial.print("$$");
+  Serial.print(round(DHT.humidity));
+  Serial.print("$$");
+  Serial.print(round(DHT.temperature));
+  Serial.print("$$");
+  Serial.println(output_value);
+}

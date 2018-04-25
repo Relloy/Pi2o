@@ -1,0 +1,63 @@
+#include <dht.h>
+#include <math.h>
+#define DHT11_PIN 7
+dht DHT;
+#moisture sensor pin
+int sensor_pin = A0;
+int output_value;
+int motorPin = 13;
+#watertime acts as a multiplier, i.e watertime = 8 means 8 x 1000 miliseconds aka 8 seconds
+int watertime = 8;
+
+void setup(){
+  Serial.begin(9600);
+  #setting up the pump pin to act as output.
+  pinMode(motorPin, OUTPUT);
+  delay(2000);
+}
+
+void loop(){
+  
+  #storing the raw moisture value from the sensor (ranges from 0 - 1023)
+  output_value= analogRead(sensor_pin);
+  #maps the 0 - 1023 range to a more sensible ranges
+  output_value = map(output_value,550,0,0,100);
+  
+  if(output_value < 35){
+    printOut(1);
+  }
+  else{
+    printOut(0);
+  }
+  delay(10000);
+}
+
+#water pump function, will send signal to pump to water, the amount of water depends on watertime
+void pump(int n){
+ if(n == 1){
+  #by setting the pump pin to high, the pump will water until the delay is finished
+  digitalWrite(motorPin, HIGH);
+  delay(watertime*1000);
+  digitalWrite(motorPin, LOW);
+ }
+ else{
+  #shuts the pump off
+  digitalWrite(motorPin, LOW);
+ } 
+}
+
+void printOut(int watering){
+  #sends either a 0 or 1 to pump function, 1 means to water
+  pump(watering);
+  #sends a 0 or 1 to the Pi, telling it if its watering or not (timestamp purposes)
+  Serial.print(watering);
+  Serial.print("$$");
+  #sends the humidity
+  Serial.print(round(DHT.humidity));
+  Serial.print("$$");
+  #sends the temperature
+  Serial.print(round(DHT.temperature));
+  Serial.print("$$");
+  #sends the moisture
+  Serial.println(output_value);
+}
