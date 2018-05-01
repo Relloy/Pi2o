@@ -1,5 +1,4 @@
 import serial
-import time
 import csv
 import datetime
 #sets up the serial connection
