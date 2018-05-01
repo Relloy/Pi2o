@@ -5,7 +5,7 @@ dht DHT;
 #moisture sensor pin
 int sensor_pin = A0;
 int output_value;
-int motorPin = 13;
+int motorPin = 8;
 #watertime acts as a multiplier, i.e watertime = 8 means 8 x 1000 miliseconds aka 8 seconds
 int watertime = 8;
 
